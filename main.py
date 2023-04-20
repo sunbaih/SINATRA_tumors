@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description='SINATRA Pro')
 args = parser.parse_args()
 
 directory = "/Users/baihesun/cancer_data"
-#directory = "/users/bsun14"
+directory = "/users/bsun14"
 
 
 n_sample = 19
@@ -27,7 +27,7 @@ parallel = False
 label_type = "continuous"
 input_folder = "%s/BRATS_nifti_test"%(directory)
 out_directory = "%s/BRATS_nifti_out"%(directory)
-labels_data = "%s/labels_data.txt"%(directory)
+labels_data = "%s/data_labels.txt"%(directory)
 
 def get_first_file_path(folder_path):
     files = os.listdir(folder_path)
@@ -66,15 +66,13 @@ y = np.loadtxt(labels_data)
 X = np.loadtxt("%s/ECT.txt"%(out_directory))
 not_vacuum = np.loadtxt("%s/notvacuum.txt"%(out_directory))
 rates = np.loadtxt("%s/rates.txt"%(out_directory))
-"""
-"""
-"""
+
 kld, rates, delta, eff_samp_size = calc_rate(X,y, func= func, bandwidth= 0.01, n_mcmc= 100000,low_rank=False, parallel=parallel,
                                              n_core=-1, verbose=verbose)
 
 
 np.savetxt("%s/rates.txt"%(out_directory),rates)
-"""
+
 
 """
 directions = np.loadtxt("/Users/baihesun/trial_19/directions_20_8_0.80.txt")
