@@ -9,7 +9,7 @@ import SimpleITK as sitk
 from skimage import measure
 
 """
-Translated to Python from original SINATRA. 
+Most methods translated to Python from original SINATRA. 
 """
 
 def project_rate_on_nonvacuum(rates,not_vacuum):
@@ -22,15 +22,10 @@ def project_rate_on_nonvacuum(rates,not_vacuum):
     return rates_new
 
 def process_stl_file(stl_file_path):
-    # Load the STL file
     stl_mesh = mesh.Mesh.from_file(stl_file_path)
-    
-    # Extract the vertices, edges, and faces
     vertices = stl_mesh.vectors.reshape(-1, 3)
     faces = np.arange(len(vertices)).reshape(-1, 3)
     edges = stl_mesh.edges.reshape(-1, 2)
-
-    # Create the mesh_complex dictionary
     mesh_complex = {'Vertices': vertices, 'Edges': edges, 'Faces': faces}
     return mesh_complex
 
@@ -53,7 +48,6 @@ def compute_selected_vertices_cones(directions, mesh_complex, rate_vals, n_filtr
     return total_selected_vertices
 
 def highlight_selected_faces(nifti_path, reconstructed_faces, out_directory):
-        # Create a trimesh object from the vertices, edges, and faces
     print(reconstructed_faces.shape)
     vertices, edges, faces = extract_mesh_data(nifti_path)
     colors = np.zeros([len(faces), 3])
@@ -61,10 +55,8 @@ def highlight_selected_faces(nifti_path, reconstructed_faces, out_directory):
         colors[reconstructed_faces[i]]=[1, 0, 0]
     mymesh = trimesh.Trimesh(vertices=vertices, faces=faces)
     mymesh.visual.face_colors = colors
-    # visualize the mesh with colors using the viewer
     mymesh.show()
     mymesh.save('colored_model.stl')
-
 
 
 def compute_selected_faces_cones(directions, mesh_complex, rate_vals, n_filtration=25, threshold=-1, cone_size=1, ball=True, ball_radius=None, radius=0):

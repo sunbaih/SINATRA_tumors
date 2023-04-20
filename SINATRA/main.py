@@ -27,7 +27,7 @@ parallel = False
 label_type = "continuous"
 input_folder = "%s/BRATS_nifti_test"%(directory)
 out_directory = "%s/BRATS_nifti_out"%(directory)
-labels_data = "%s/data_labels.txt"%(directory)
+labels_data = "%s/labels_data.txt"%(directory)
 
 def get_first_file_path(folder_path):
     files = os.listdir(folder_path)
@@ -42,13 +42,14 @@ if not os.path.exists(out_directory):
     os.mkdir(out_directory)
 
 
+
 directions = generate_equidistributed_cones(n_cone=n_cone, n_direction_per_cone=n_direction_per_cone,
                                             cap_radius= cap_radius, hemisphere=False)
 
 np.savetxt("%s/directions.txt"%(out_directory),directions)
 
 
-
+"""
 X, y, not_vacuum = compute_ec_curve_folder(input_folder, labels_data, out_directory,
                                            directions = directions,
                                            n_sample=n_sample, ec_type="SECT",
@@ -58,15 +59,16 @@ X, y, not_vacuum = compute_ec_curve_folder(input_folder, labels_data, out_direct
 np.savetxt("%s/ECT.txt"%(out_directory),X)
 np.savetxt("%s/notvacuum.txt"%(out_directory),not_vacuum)
 np.savetxt('%s/labels.txt'%(out_directory),y)
-
-
 """
+
+
+
 directions = np.loadtxt("%s/directions.txt"%(out_directory))
 y = np.loadtxt(labels_data)
 X = np.loadtxt("%s/ECT.txt"%(out_directory))
 not_vacuum = np.loadtxt("%s/notvacuum.txt"%(out_directory))
 rates = np.loadtxt("%s/rates.txt"%(out_directory))
-"""
+
 
 kld, rates, delta, eff_samp_size = calc_rate(X,y, func= func, bandwidth= 0.01, n_mcmc= 100000,low_rank=False, parallel=parallel,
                                              n_core=-1, verbose=verbose)
