@@ -2,8 +2,8 @@
 
 import numpy as np
 from scipy.spatial import distance
-import MDAnalysis
-from MDAnalysis.lib.nsgrid import FastNS, NSResults
+#import MDAnalysis
+#from MDAnalysis.lib.nsgrid import FastNS, NSResults
 import multiprocessing
 from joblib import Parallel, delayed
 

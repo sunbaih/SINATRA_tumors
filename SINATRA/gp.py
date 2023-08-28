@@ -159,18 +159,11 @@ def calc_rate(X, y, func, bandwidth=0.01, sampling_method='ESS', n_mcmc=100000, 
     samples = Elliptical_Slice_Sampling(Kn, y, func, n_mcmc=n_mcmc, burn_in=burn_in, seed=seed,
                                         verbose=verbose)
 
-    #samples = DGP_samples()
     print("Elliptical Slice Sampling done")
-
-    #np.savetxt('/users/bsun14/sp/trial_10/gp_X.txt', X)
-    #np.savetxt('/users/bsun14/sp/trial_10/gp_samples.txt', samples)
     kld, rates, delta, eff_samp_size = RATE.calc_RATE(X=X, f_draws=samples, prop_var=prop_var, low_rank=low_rank,
                                             parallel=parallel, n_core=n_core, verbose=verbose)
-    # TESTING WHAT THE ERROR IS HERE
-    #kld, rates, delta, eff_samp_size = RATE_tch.calc_RATE(X=X, f_draws=samples, prop_var=prop_var, low_rank=low_rank,
-                                                #parallel=parallel, n_core=n_core, verbose=verbose)
 
-    return kld, rates, delta, eff_samp_size
+    return kld, rates, delta, eff_samp_size, samples
 
 def calc_rate_test(gp_X, gp_samples, prop_var=1, low_rank=False, parallel=False, n_core=-1, verbose=False):
     X = np.loadtxt(gp_X)

@@ -43,7 +43,6 @@ def compute_selected_vertices_cones(directions, mesh_complex, rate_vals, n_filtr
         coned_vertices.append(summarize_vertices(cone_dirs, mesh_complex, cone_rate_vals, n_filtration, reduction_operation=np.intersect1d, threshold=threshold, cone_size=cone_size, ball=ball, ball_radius=ball_radius, radius=radius))
 
     total_selected_vertices = set().union(*coned_vertices)
-    print(total_selected_vertices)
     total_selected_vertices = np.array(list(total_selected_vertices))
     return total_selected_vertices
 
@@ -100,12 +99,15 @@ def summarize_vertices(directions, mesh_complex, rate_vals, n_filtration, reduct
         else:
             buckets = np.linspace(vtx_projection.min(), vtx_projection.max(), num=n_filtration+1)
         
-        projection_bucket = np.digitize(vtx_projection, buckets) + (i*n_filtration) - 1
+        projection_bucket = np.digitize(vtx_projection, buckets) 
         
+        # update index to reflect rate values
+        projection_bucket = projection_bucket + (i - 1)*n_filtration
+                
         selected_vertices.append(np.where(np.isin(projection_bucket, indices))[0])
-
+    
     final_selected_vertices = reduce(reduction_operation, selected_vertices)
-
+    print(final_selected_vertices)
     return final_selected_vertices
 
 
@@ -113,21 +115,32 @@ def summarize_vertices(directions, mesh_complex, rate_vals, n_filtration, reduct
 Haven't tested this one yet.
 """
 
-def reconstruct_vertices_on_shape(directions, mesh_complex, rate_vals, length, cuts=10, cone_size=None, ball_radius=None, ball=True, radius=0):
-    vert_matrix = np.zeros((mesh_complex['Vertices'].shape[0], 2))
+def reconstruct_vertices_on_shape(directions, mesh_complex, rate_vals, n_filtration, cuts=50, cone_size=None, ball_radius=None, ball=True, radius=0):
+    vertices, edges, faces = extract_mesh_data(mesh_complex)
+    vert_matrix = np.zeros((vertices.shape[0], 2))
     cut = cuts
     reconstructed_vertices = np.array([], dtype=int)
-    for threshold in np.quantile(rate_vals, np.linspace(1, 0, cuts)):
+    #for threshold in np.quantile(rate_vals, np.linspace(1, 0, cuts)):
+    for threshold in np.linspace(0.000001, 0, cuts):
+        print(threshold)
         if threshold > np.max(rate_vals):
+            print(threshold, "threshold too high")
             continue
         else:
-            selected_vertices = compute_selected_vertices_cones(directions=directions, mesh_complex=mesh_complex, rate_vals=rate_vals, n_filtration=length, threshold=threshold,
+            selected_vertices = compute_selected_vertices_cones(directions=directions, mesh_complex=mesh_complex, rate_vals=rate_vals, n_filtration=n_filtration, threshold=threshold,
                                                           cone_size=cone_size, ball_radius=ball_radius, ball=ball, radius=radius)
             selected_vertices = np.setdiff1d(selected_vertices, reconstructed_vertices)
-            vert_matrix[selected_vertices, 0] = cut
-            vert_matrix[selected_vertices, 1] = threshold
+            print(selected_vertices)
+            if len(selected_vertices)==0:
+                print("no selected vertices")
+                pass
+            else: 
+                vert_matrix[selected_vertices, 0] = cut
+                vert_matrix[selected_vertices, 1] = threshold
             cut = cut - 1
             reconstructed_vertices = np.concatenate((reconstructed_vertices, selected_vertices))
-        if len(reconstructed_vertices) == mesh_complex['Vertices'].shape[0]:
+            print(threshold, len(reconstructed_vertices))
+        if len(reconstructed_vertices) == vertices.shape[0]:
+            print(cut, threshold)
             break
     return vert_matrix

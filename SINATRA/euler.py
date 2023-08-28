@@ -197,11 +197,14 @@ def extract_mesh_datax(mesh):
     return vertices, edges, faces
 
 def extract_mesh_data(filename):
-    verts, faces, normals, values = measure.marching_cubes(sitk.GetArrayViewFromImage(sitk.ReadImage(filename)), 0)
+    
+    nifti = sitk.ReadImage(filename)
+    data = sitk.GetArrayFromImage(nifti)
+    verts, faces, _, _ = measure.marching_cubes(data, level=0.0, spacing= [1, 1, 1])
+ 
     edges = extract_edges(faces)
     
     return verts, edges, faces 
-
 
 
 def compute_ec_curve_single(vertices, edges, faces, direction, ball_radius, n_filtration=25, ec_type="ECT", include_faces=True):
@@ -377,8 +380,7 @@ def compute_ec_curve_folder(directory_data, labels_data, outfolder,
     data = np.divide(data, std)
     data[np.isnan(data)] = 0
 
-    label = []
-    label = np.loadtxt(labels_data)
+    label = labels_data
         
     #returns ECSS that hasn't had the vacuum spots removed. This is so that reconstruction can be simpler. 
     return data, label, not_vacuum 

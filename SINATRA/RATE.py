@@ -96,21 +96,12 @@ def calc_RATE(X, f_draws=None, prop_var=1, low_rank=False, parallel=False, n_cor
         kld = np.zeros(mu.size, dtype=float)
         for q in range(mu.size):
             kld[q] = calc_kld(mu, Lambda, V, q, verbose)
-            print("kld[q]:", kld[q])
     if verbose:
         sys.stdout.write("\n")
         sys.stdout.write("KLD calculation Completed.\n")
 
-    ###CHANGE BELOW
-
-    #kld = np.absolute(kld)
-
     ### Compute the corresponding “RelATive cEntrality” (RATE) measure ###
     rates = kld / np.sum(kld)
-
-    print("np.sum(kld):", np.sum(kld))
-    print("rates:", rates)
-
 
     ### Find the entropic deviation from a uniform distribution ###
     # delta = np.sum(rates*np.log((len(mu)-len(nullify))*rates))
